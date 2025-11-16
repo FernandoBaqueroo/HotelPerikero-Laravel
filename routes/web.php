@@ -44,12 +44,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('reservas', ReservaController::class);
     Route::resource('reserva-servicios', ReservaServicioController::class);
-    Route::get('/habitaciones/show', [HabitacionController::class, 'show'])->name('habitaciones.show');
     Route::post('/habitaciones/filtrar', [HabitacionController::class, 'filtrar'])->name('habitaciones.filtrar');
-
-    Route::post('/reservas', [ReservaController::class, 'store'])->name('reservas.store');
-    Route::get('/reservas/create/{id}', [ReservaController::class, 'create'])->name('reservas.create');
-    Route::get('/reservas/{reserva}', [ReservaController::class, 'show'])->name('reservas.show');
+    
+    // Rutas personalizadas adicionales para reservas
+    Route::get('/reservas/create/{id}', [ReservaController::class, 'create'])->name('reservas.create.custom');
     Route::delete('/reservas/{reserva}/delete', [ReservaController::class, 'destroy'])->name('reservas.delete');
     Route::get('/reservas/{reserva}/delete-view', [ReservaController::class, 'showDeleteView'])->name('reservas.delete.view');
     Route::get('/send-welcome-email', [EmailController::class, 'sendWelcomeEmail']);
@@ -76,12 +74,8 @@ Route::middleware(['role:parking'])->group(function () {
 
 Route::post('/check-parking-availability', [ReservaParkingController::class, 'checkParkingAvailability']);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::post('/reservas', [ReservaController::class, 'store'])->name('reservas.store');
-Route::get('/reservas/create/{id}', [ReservaController::class, 'create'])->name('reservas.create');
-Route::get('/reservas/{reserva}', [ReservaController::class, 'show'])->name('reservas.show');
-Route::get('/habitaciones/{habitacion}', 'HabitacionController@show')->name('habitaciones.show');
-Route::delete('/reservas/{reserva}/delete', [ReservaController::class, 'destroy'])->name('reservas.delete');
-Route::get('/reservas/{reserva}/delete-view', [ReservaController::class, 'showDeleteView'])->name('reservas.delete.view');
+// Ruta eliminada - ya está definida por Route::resource('habitaciones', HabitacionController::class)
+// Rutas duplicadas eliminadas - ya están definidas arriba en el grupo auth
 Route::post('/actualizar-usuario', [UserController::class, 'actualizar'])->name('actualizar-usuario');
 
 // Rutas protegidas por middleware 'role:admin'

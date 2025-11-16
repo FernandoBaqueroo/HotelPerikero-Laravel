@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "dev": "vite --host=192.168.33.20",
+        "dev": "vite",
         "build": "vite build"
     },
     "devDependencies": {
@@ -16,6 +16,8 @@
         "vite": "^4.5.2"
     },
     "dependencies": {
-        "bootstrap-icons": "^1.10.3"
+        "bootstrap-icons": "^1.10.3",
+        "laravel-echo": "^2.2.0",
+        "pusher-js": "^8.4.0"
     }
 }

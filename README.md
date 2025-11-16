@@ -18,21 +18,97 @@ Este documento proporciona una visión general de un sistema de reserva de habit
 
 ## Requisitos del sistema
 
-- PHP >= 7.3
-- Composer
-- MySQL
+- Docker Desktop
+- Composer (para instalación inicial)
+- Node.js (para instalación inicial)
 
-## Configuración inicial
+## Configuración inicial con Docker Sail
+
+### Opción 1: Configuración automática (Recomendada)
 
 1. Clona el repositorio del proyecto.
-2. Ejecuta `composer install` para instalar dependencias.
-3. Ejecuta composer require pusher/pusher-php-server
-4. Ejecuta npm install --save laravel-echo pusher-js
-5. Configura tu archivo `.env` con las credenciales de la base de datos.
-6. Ejecuta `php artisan migrate` para configurar la base de datos.
-7. Ejecuta `php artisan db:seed` para rellenar la base de datos.
-8. Inicia el servidor de desarrollo con ` php artisan serve --host=192.168.33.20`.
-9. Compila y desarrolla los assets del frontend como JavaScript y CSS con `npm run dev`.
+2. Navega al directorio del proyecto Laravel:
+   ```bash
+   cd HotelPerikero-Laravel
+   ```
+3. Ejecuta el script de configuración automática:
+
+   **En Windows:**
+   ```cmd
+   setup-sail.bat
+   ```
+
+   **En Linux/macOS:**
+   ```bash
+   ./setup-sail.sh
+   ```
+
+### Opción 2: Configuración manual
+
+1. Clona el repositorio del proyecto.
+2. Navega al directorio del proyecto Laravel:
+   ```bash
+   cd HotelPerikero-Laravel
+   ```
+3. Copia el archivo de configuración:
+   ```bash
+   cp .env.example .env
+   ```
+4. Instala las dependencias de Composer:
+   ```bash
+   composer install
+   ```
+5. Instala las dependencias de NPM:
+   ```bash
+   npm install
+   ```
+6. Inicia los contenedores de Docker:
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
+7. Genera la clave de aplicación:
+   ```bash
+   ./vendor/bin/sail artisan key:generate
+   ```
+8. Ejecuta las migraciones y seeders:
+   ```bash
+   ./vendor/bin/sail artisan migrate --seed
+   ```
+9. Compila los assets del frontend:
+   ```bash
+   ./vendor/bin/sail npm run dev
+   ```
+
+## Acceso a la aplicación
+
+- **Aplicación web:** http://localhost
+- **Mailpit (interfaz de correo):** http://localhost:8025
+- **Base de datos:** localhost:3306 (usuario: sail, contraseña: password)
+
+## Comandos útiles de Docker Sail
+
+```bash
+# Iniciar contenedores
+./vendor/bin/sail up -d
+
+# Detener contenedores
+./vendor/bin/sail down
+
+# Ver logs
+./vendor/bin/sail logs
+
+# Ejecutar comandos de Artisan
+./vendor/bin/sail artisan [comando]
+
+# Ejecutar comandos de NPM
+./vendor/bin/sail npm [comando]
+
+# Acceder al contenedor
+./vendor/bin/sail shell
+
+# Reconstruir contenedores
+./vendor/bin/sail build --no-cache
+```
 
 ## Información de Inicio de Sesión
 1. **ADMIN:** admin@admin.com / admin
@@ -67,6 +143,120 @@ Este documento proporciona una visión general de un sistema de reserva de habit
 - **Visualización de Espacios**: El gestor de parking puede ver el estado actual de las plazas de parking.
 - **Asignación de Plazas de Parking**: Puede asignar plazas de parking a las reservas que lo requieran.
 - **Liberación de Plazas de Parking**: Cuando una reserva se cancela o termina, el gestor de parking puede marcar la plaza como disponible nuevamente.
+
+## Despliegue en Railway
+
+### Opción 1: Despliegue desde GitHub (Recomendado)
+
+1. **Sube tu código a GitHub:**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/tu-usuario/hotel-perikero.git
+   git push -u origin main
+   ```
+
+2. **Conecta con Railway:**
+   - Ve a [Railway.app](https://railway.app)
+   - Inicia sesión con GitHub
+   - Haz clic en "New Project"
+   - Selecciona "Deploy from GitHub repo"
+   - Elige tu repositorio
+
+3. **Configura las variables de entorno:**
+   - Ve a la pestaña "Variables"
+   - Agrega las siguientes variables:
+     ```
+     APP_KEY=base64:tu-clave-generada
+     APP_ENV=production
+     APP_DEBUG=false
+     APP_URL=https://tu-proyecto.railway.app
+     ```
+
+4. **Agrega base de datos MySQL:**
+   - En el dashboard de Railway
+   - Haz clic en "New" → "Database" → "MySQL"
+   - Railway generará automáticamente las variables:
+     - `MYSQL_HOST`
+     - `MYSQL_PORT`
+     - `MYSQL_DATABASE`
+     - `MYSQL_USER`
+     - `MYSQL_PASSWORD`
+
+5. **Ejecuta migraciones:**
+   - Ve a la pestaña "Deployments"
+   - Haz clic en el botón "..." del deployment
+   - Selecciona "Open Console"
+   - Ejecuta: `php artisan migrate --seed`
+
+### Opción 2: Despliegue desde CLI
+
+1. **Instala Railway CLI:**
+   ```bash
+   npm install -g @railway/cli
+   ```
+
+2. **Inicia sesión:**
+   ```bash
+   railway login
+   ```
+
+3. **Inicializa el proyecto:**
+   ```bash
+   railway init
+   ```
+
+4. **Despliega:**
+   ```bash
+   railway up
+   ```
+
+5. **Configura variables:**
+   ```bash
+   railway variables set APP_KEY=base64:tu-clave-generada
+   railway variables set APP_ENV=production
+   railway variables set APP_DEBUG=false
+   ```
+
+6. **Agrega base de datos:**
+   ```bash
+   railway add mysql
+   ```
+
+7. **Ejecuta migraciones:**
+   ```bash
+   railway run php artisan migrate --seed
+   ```
+
+### Variables de entorno necesarias:
+
+```env
+APP_NAME=HotelPerikero
+APP_ENV=production
+APP_KEY=base64:tu-clave-generada
+APP_DEBUG=false
+APP_URL=https://tu-proyecto.railway.app
+
+DB_CONNECTION=mysql
+DB_HOST=${MYSQL_HOST}
+DB_PORT=${MYSQL_PORT}
+DB_DATABASE=${MYSQL_DATABASE}
+DB_USERNAME=${MYSQL_USER}
+DB_PASSWORD=${MYSQL_PASSWORD}
+
+# Redis (opcional)
+REDIS_HOST=${REDIS_HOST}
+REDIS_PASSWORD=${REDIS_PASSWORD}
+REDIS_PORT=${REDIS_PORT}
+```
+
+### Generar clave de aplicación:
+
+```bash
+php artisan key:generate --show
+```
 
 ## Video Demostración
 
